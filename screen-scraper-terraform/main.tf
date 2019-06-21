@@ -12,8 +12,11 @@ terraform {
   }
 }
 
-resource "aws_security_group" "default" {
-  name   = "default"
+resource "aws_security_group" "screen-scraper-security-group" {
+  name   = "screen-scraper-security-group"
+  tags = {
+    Name = "C24519-screen-scraper-hsbc-security-group"
+  }
   vpc_id = module.vpc.vpc_id
 }
 
@@ -29,7 +32,7 @@ resource "aws_lb" "nlb" {
   load_balancer_type = "network"
   subnets            = "${module.vpc.public_subnets}"
   security_groups = [
-    "${aws_security_group.default.name}"]
+    "${aws_security_group.screen-scraper-security-group.name}"]
   tags = {
     Name = "C24519-screen-scraper-hsbc-nlb"
   }
