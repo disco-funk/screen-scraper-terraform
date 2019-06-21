@@ -12,11 +12,8 @@ terraform {
   }
 }
 
-resource "aws_security_group" "screen-scraper-security-group" {
-  name   = "screen-scraper-security-group"
-  tags = {
-    Name = "C24519-screen-scraper-hsbc-security-group"
-  }
+data "aws_security_group" "default" {
+  name   = "default"
   vpc_id = module.vpc.vpc_id
 }
 
@@ -31,8 +28,8 @@ resource "aws_lb" "nlb" {
   internal           = false
   load_balancer_type = "network"
   subnets            = "${module.vpc.public_subnets}"
-  security_groups = [
-    "${aws_security_group.screen-scraper-security-group.name}"]
+  security_groups = ["${module.vpc.default_security_group_id}"]
+
   tags = {
     Name = "C24519-screen-scraper-hsbc-nlb"
   }
@@ -76,9 +73,9 @@ resource "aws_instance" "screen-scrape-ec2" {
   ami           = "ami-07dc734dc14746eab"
   instance_type = "t2.micro"
   subnet_id     = "${module.vpc.private_subnets[count.index]}"
+  security_groups = ["${module.vpc.default_security_group_id}"]
   availability_zone = "${element(var.azs, count.index)}"
-  security_groups = [
-    "${aws_security_group.screen-scraper-security-group.name}"]
+
   tags = {
     Name = "C24519-screen-scraper-hsbc-${element(var.azs, count.index)}"
   }
