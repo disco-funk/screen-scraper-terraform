@@ -17,6 +17,12 @@ data "aws_security_group" "default" {
   vpc_id = module.vpc.vpc_id
 }
 
+variable "azs" {
+  description = "Run the EC2 Instances in these Availability Zones"
+  type = "list"
+  default = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+}
+
 resource "aws_lb" "nlb" {
   name               = "screen-scraper-nlb"
   internal           = false
@@ -60,32 +66,16 @@ module "vpc" {
   }
 }
 
-resource "aws_instance" "ec2-2a" {
+resource "aws_instance" "screen-scrape-ec2" {
+  count = 3
+
   ami           = "ami-07dc734dc14746eab"
   instance_type = "t2.micro"
-  subnet_id     = "${module.vpc.public_subnets[0]}"
+  subnet_id     = "${module.vpc.public_subnets[count.index]}"
+
+  availability_zone = "${element(var.azs, count.index)}"
 
   tags = {
-    Name = "C24519-screen-scraper-hsbc-ec2-2a"
-  }
-}
-
-resource "aws_instance" "ec2-2b" {
-  ami           = "ami-07dc734dc14746eab"
-  instance_type = "t2.micro"
-  subnet_id     = "${module.vpc.public_subnets[1]}"
-
-  tags = {
-    Name = "C24519-screen-scraper-hsbc-ec2-2b"
-  }
-}
-
-resource "aws_instance" "ec2-2c" {
-  ami           = "ami-07dc734dc14746eab"
-  instance_type = "t2.micro"
-  subnet_id     = "${module.vpc.public_subnets[2]}"
-
-  tags = {
-    Name = "C24519-screen-scraper-hsbc-ec2-2c"
+    Name = "C24519-screen-scraper-hsbc-${element(var.azs, count.index)}"
   }
 }
