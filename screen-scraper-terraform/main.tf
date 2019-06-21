@@ -78,7 +78,7 @@ resource "aws_instance" "screen-scrape-ec2" {
   subnet_id     = "${module.vpc.private_subnets[count.index]}"
   availability_zone = "${element(var.azs, count.index)}"
   security_groups = [
-    "${aws_security_group.default.name}"]
+    "${aws_security_group.screen-scraper-security-group.name}"]
   tags = {
     Name = "C24519-screen-scraper-hsbc-${element(var.azs, count.index)}"
   }
