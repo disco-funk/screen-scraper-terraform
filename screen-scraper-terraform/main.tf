@@ -8,8 +8,6 @@ data "aws_security_group" "default" {
   vpc_id = module.vpc.vpc_id
 }
 
-
-
 resource "aws_lb" "nlb" {
   name               = "screen-scraper-nlb"
   internal           = false
