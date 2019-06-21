@@ -3,6 +3,14 @@ provider "aws" {
   profile = "default"
 }
 
+terraform {
+  backend "s3" {
+    bucket = "screen-scrape-hsbc-terraform-state"
+    key    = "terraform/key"
+    region = "eu-west-2"
+  }
+}
+
 data "aws_security_group" "default" {
   name   = "default"
   vpc_id = module.vpc.vpc_id
