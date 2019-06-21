@@ -25,7 +25,7 @@ resource "aws_lb" "nlb" {
   enable_deletion_protection = true
 
   tags = {
-    Name = "screen-scraper-hsbc-nlb"
+    Name = "C24519-screen-scraper-hsbc-nlb"
   }
 }
 
@@ -46,19 +46,18 @@ module "vpc" {
   single_nat_gateway  = true
 
   public_subnet_tags = {
-    Name = "screen-scraper-hsbc-public"
+    Name = "C24519-screen-scraper-hsbc-public"
   }
   private_subnet_tags = {
-    Name = "screen-scraper-hsbc-private"
+    Name = "C24519-screen-scraper-hsbc-private"
   }
 
   tags = {
-    Owner       = "user"
-    Environment = "dev"
+    Name = "C24519-screen-scraper-hsbc-vpc"
   }
 
   vpc_tags = {
-    Name = "screen-scraper-hsbc-poc"
+    Name = "C24519-screen-scraper-hsbc-vpc-poc"
   }
 }
 
@@ -68,7 +67,7 @@ resource "aws_instance" "ec2-2a" {
   subnet_id     = "${module.vpc.public_subnets[0]}"
 
   tags = {
-    Name = "screen-scraper-hsbc-ec2-2a"
+    Name = "C24519-screen-scraper-hsbc-ec2-2a"
   }
 }
 
@@ -78,7 +77,7 @@ resource "aws_instance" "ec2-2b" {
   subnet_id     = "${module.vpc.public_subnets[1]}"
 
   tags = {
-    Name = "screen-scraper-hsbc-ec2-2b"
+    Name = "C24519-screen-scraper-hsbc-ec2-2b"
   }
 }
 
@@ -88,6 +87,6 @@ resource "aws_instance" "ec2-2c" {
   subnet_id     = "${module.vpc.public_subnets[2]}"
 
   tags = {
-    Name = "screen-scraper-hsbc-ec2-2c"
+    Name = "C24519-screen-scraper-hsbc-ec2-2c"
   }
 }
