@@ -37,6 +37,35 @@ resource "aws_lb" "nlb" {
   }
 }
 
+resource "aws_lb_listener" "lb_subnet_tcp" {
+  load_balancer_arn = "${aws_lb.nlb.arn}"
+  port = "80"
+  protocol = "TCP"
+
+  default_action {
+    type = "forward"
+    target_group_arn = "${aws_lb_target_group.target-group.arn}"
+  }
+}
+
+resource "aws_lb_target_group" "target-group" {
+  name = "screen-scraper-target-group"
+  port = 80
+  protocol = "TCP"
+  vpc_id = module.vpc.vpc_id
+  tags = {
+    Name = "C24519-screen-scraper-hsbc-target-group"
+  }
+}
+
+resource "aws_lb_target_group_attachment" "target-group-attachment" {
+  count = 3
+
+  target_group_arn = "${aws_lb_target_group.target-group.arn}"
+  target_id = "${aws_instance.screen-scrape-ec2[count.index].id}"
+  port = 80
+}
+
 module "vpc" {
   source = "../"
 
