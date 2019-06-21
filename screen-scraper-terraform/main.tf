@@ -8,6 +8,7 @@ terraform {
     bucket = "screen-scrape-hsbc-terraform-state"
     key    = "terraform/key"
     region = "eu-west-2"
+    dynamodb_table = "screen-scrape-hsbc-terraform-state-dynamo"
   }
 }
 
@@ -21,8 +22,6 @@ resource "aws_lb" "nlb" {
   internal           = false
   load_balancer_type = "network"
   subnets            = "${module.vpc.public_subnets}"
-
-  enable_deletion_protection = true
 
   tags = {
     Name = "C24519-screen-scraper-hsbc-nlb"
