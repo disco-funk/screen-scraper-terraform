@@ -27,14 +27,11 @@ var terraformOptions = &terraform.Options{
 	//NoColor: true,
 }
 
-// An example of how to test the simple Terraform module in examples/terraform-basic-example using Terratest.
 func Test(t *testing.T) {
 	t.Parallel()
 
-	// At the end of the test, run `terraform destroy` to clean up any resources that were created
 	// defer terraform.Destroy(t, terraformOptions)
 
-	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
 	terraform.InitAndApply(t, terraformOptions)
 
 	checkOutput(t)
