@@ -39,7 +39,10 @@ func checkInstances(t *testing.T) {
 	instanceTags := terraform.OutputList(t, terraformOptions, "instance_tags")
 	instanceIds := terraform.OutputList(t, terraformOptions, "instance_ids")
 	for index, instanceTag := range instanceTags {
-		actualInstanceIds := aws.GetEc2InstanceIdsByTag(t, "eu-west-2", "Name", instanceTag)
+		actualInstanceIds := aws.GetEc2InstanceIdsByFilters(t,
+			"eu-west-2",
+			map[string][]string{"tag:Name": {instanceTag},
+				"instance-state-name": {"running"}})
 		assert.Equal(t, instanceIds[index], actualInstanceIds[0])
 	}
 }
