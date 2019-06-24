@@ -20,6 +20,8 @@ func Test(t *testing.T) {
 	t.Parallel()
 
 	terraform.WorkspaceSelectOrNew(t, terraformOptions, "terratest")
+	defer terraform.WorkspaceSelectOrNew(t, terraformOptions, "default")
+
 	defer terraform.Destroy(t, terraformOptions)
 	terraform.InitAndApply(t, terraformOptions)
 
