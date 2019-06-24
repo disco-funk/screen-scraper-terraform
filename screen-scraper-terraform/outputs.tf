@@ -32,3 +32,14 @@ output "azs" {
   description = "A list of availability zones spefified as argument to this module"
   value       = module.vpc.azs
 }
+
+# Instance tags
+output "instance_tags" {
+  description = "A list of the screen-scrape-ec2 instances"
+  value       = aws_instance.screen-scrape-ec2.*.tags.Name
+}
+
+# Instance ids
+output "instance_ids" {
+  value = aws_instance.screen-scrape-ec2.*.id
+}
