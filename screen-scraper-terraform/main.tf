@@ -23,6 +23,23 @@ data "aws_security_group" "default" {
   vpc_id = module.vpc.vpc_id
 }
 
+resource "aws_security_group" "tcp-port80" {
+  name = "${var.prefix}-SS-tcp-port80"
+  description = "Allow port 80 TCP inbound traffic"
+  vpc_id = module.vpc.vpc_id
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.prefix}-SS-hsbc-sg"
+  }
+}
+
 variable "azs" {
   description = "Run the EC2 Instances in these Availability Zones"
   type = "list"
@@ -84,12 +101,12 @@ module "vpc" {
     "eu-west-2b",
     "eu-west-2c"]
   private_subnets = [
-    "10.32.0.0/22",
-    "10.32.4.0/22",
-    "10.32.8.0/22",
     "10.32.24.0/22",
     "10.32.28.0/22",
-    "10.32.32.0/22"]
+    "10.32.32.0/22",
+    "10.32.0.0/22",
+    "10.32.4.0/22",
+    "10.32.8.0/22"]
   public_subnets = [
     "10.32.12.0/22",
     "10.32.16.0/22",
@@ -120,10 +137,14 @@ module "vpc" {
 resource "aws_instance" "screen-scrape-ec2" {
   count = 3
 
-  ami = "ami-07dc734dc14746eab"
+  ami = "ami-0395e39e84620dd79"
+  // C24519-screen-scraper-hsbc-nginx-ec2 AMI
   instance_type = "t2.micro"
   subnet_id = module.vpc.private_subnets[count.index]
   availability_zone = var.azs[count.index]
+
+  security_groups = [
+    "${aws_security_group.tcp-port80.id}"]
 
   tags = {
     Name = "${var.prefix}-SS-hsbc-${var.azs[count.index]}"
