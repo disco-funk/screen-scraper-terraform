@@ -11,27 +11,16 @@ import (
 var terraformOptions = &terraform.Options{
 	TerraformDir: "../screen-scraper-terraform",
 
-	// Variables to pass to our Terraform code using -var options
-	//Vars: map[string]interface{}{
-	//	"example": expectedText,
-
-	// We also can see how lists and maps translate between terratest and terraform.
-	//	"example_list": expectedList,
-	//	"example_map":  expectedMap,
-	//},
-
-	// Variables to pass to our Terraform code using -var-file options
-	//VarFiles: []string{"varfile.tfvars"},
-
-	// Disable colors in Terraform commands so its easier to parse stdout/stderr
-	//NoColor: true,
+	Vars: map[string]interface{}{
+		"prefix": "C24519-test",
+	},
 }
 
 func Test(t *testing.T) {
 	t.Parallel()
 
-	// defer terraform.Destroy(t, terraformOptions)
-
+	terraform.WorkspaceSelectOrNew(t, terraformOptions, "terratest")
+	defer terraform.Destroy(t, terraformOptions)
 	terraform.InitAndApply(t, terraformOptions)
 
 	checkOutput(t)

@@ -1,3 +1,9 @@
+variable "prefix" {
+  description = "Prefix for all resources."
+  type = "string"
+  default = "C24519"
+}
+
 provider "aws" {
   region = "eu-west-2"
   profile = "default"
@@ -27,49 +33,49 @@ variable "azs" {
 }
 
 resource "aws_lb" "nlb" {
-  name = "screen-scraper-nlb"
+  name = "${var.prefix}-SS-nlb"
   internal = false
   load_balancer_type = "network"
-  subnets = "${module.vpc.public_subnets}"
+  subnets = module.vpc.public_subnets
 
   tags = {
-    Name = "C24519-screen-scraper-hsbc-nlb"
+    Name = "${var.prefix}-SS-hsbc-nlb"
   }
 }
 
 resource "aws_lb_listener" "lb_subnet_tcp" {
-  load_balancer_arn = "${aws_lb.nlb.arn}"
+  load_balancer_arn = aws_lb.nlb.arn
   port = "80"
   protocol = "TCP"
 
   default_action {
     type = "forward"
-    target_group_arn = "${aws_lb_target_group.target-group.arn}"
+    target_group_arn = aws_lb_target_group.target-group.arn
   }
 }
 
 resource "aws_lb_target_group" "target-group" {
-  name = "screen-scraper-target-group"
+  name = "${var.prefix}-SS-target-group"
   port = 80
   protocol = "TCP"
   vpc_id = module.vpc.vpc_id
   tags = {
-    Name = "C24519-screen-scraper-hsbc-target-group"
+    Name = "${var.prefix}-SS-hsbc-target-group"
   }
 }
 
 resource "aws_lb_target_group_attachment" "target-group-attachment" {
   count = 3
 
-  target_group_arn = "${aws_lb_target_group.target-group.arn}"
-  target_id = "${aws_instance.screen-scrape-ec2[count.index].id}"
+  target_group_arn = aws_lb_target_group.target-group.arn
+  target_id = aws_instance.screen-scrape-ec2[count.index].id
   port = 80
 }
 
 module "vpc" {
   source = "../"
 
-  name = "screen-scraper-vpc"
+  name = "${var.prefix}-SS-vpc"
 
   cidr = "10.32.0.0/16"
 
@@ -95,19 +101,19 @@ module "vpc" {
   single_nat_gateway = true
 
   public_subnet_tags = {
-    Name = "C24519-screen-scraper-hsbc-public"
+    Name = "${var.prefix}-SS-hsbc-public"
   }
 
   private_subnet_tags = {
-    Name = "C24519-screen-scraper-hsbc-private"
+    Name = "${var.prefix}-SS-hsbc-private"
   }
 
   tags = {
-    Name = "C24519-screen-scraper-hsbc-vpc"
+    Name = "${var.prefix}-SS-hsbc-vpc"
   }
 
   vpc_tags = {
-    Name = "C24519-screen-scraper-hsbc-vpc-poc"
+    Name = "${var.prefix}-SS-hsbc-vpc-poc"
   }
 }
 
@@ -116,10 +122,10 @@ resource "aws_instance" "screen-scrape-ec2" {
 
   ami = "ami-07dc734dc14746eab"
   instance_type = "t2.micro"
-  subnet_id = "${module.vpc.private_subnets[count.index]}"
-  availability_zone = "${element(var.azs, count.index)}"
+  subnet_id = module.vpc.private_subnets[count.index]
+  availability_zone = var.azs[count.index]
 
   tags = {
-    Name = "C24519-screen-scraper-hsbc-${element(var.azs, count.index)}"
+    Name = "${var.prefix}-SS-hsbc-${var.azs[count.index]}"
   }
 }
