@@ -47,9 +47,9 @@ output "instance_ids" {
 
 # Outputs for terratest
 output "region" {
-  value = "${var.region}"
+  value = var.region
 }
 
 output "expected_vpc_cidr" {
-  value = "${var.vpc_cidr}"
+  value = var.vpc_cidr
 }

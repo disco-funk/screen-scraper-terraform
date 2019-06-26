@@ -17,6 +17,6 @@ resource "aws_instance" "direct-channel-mock" {
   instance_type = "t2.micro"
 
   tags = {
-    Name = "${var.prefix}-SS-DC}"
+    Name = "${var.prefix}-SS-DC"
   }
 }
