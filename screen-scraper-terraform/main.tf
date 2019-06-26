@@ -1,6 +1,6 @@
 provider "aws" {
   //region = "eu-west-2"
-  region = "${var.region}"
+  region = var.region
   profile = "default"
 }
 
@@ -24,10 +24,10 @@ resource "aws_security_group" "tcp-port80" {
   vpc_id = module.vpc.vpc_id
 
   ingress {
-    from_port = "${var.ingress_from_port}"
-    to_port = "${var.ingress_to_port}"
-    protocol = "${var.ingress_protocol}"
-    cidr_blocks = "${var.ingress_cidr_blocks}"
+    from_port = var.ingress_from_port
+    to_port = var.ingress_to_port
+    protocol = var.ingress_protocol
+    cidr_blocks = var.ingress_cidr_blocks
   }
 
   tags = {
@@ -38,7 +38,7 @@ resource "aws_security_group" "tcp-port80" {
 resource "aws_lb" "nlb" {
   name = "${var.prefix}-SS-nlb"
   internal = false
-  load_balancer_type = "${var.lb_type}"
+  load_balancer_type = var.lb_type
   subnets = module.vpc.public_subnets
 
   tags = {
@@ -48,8 +48,8 @@ resource "aws_lb" "nlb" {
 
 resource "aws_lb_listener" "lb_subnet_tcp" {
   load_balancer_arn = aws_lb.nlb.arn
-  port = "${var.lb_listener_port}"
-  protocol = "${var.lb_listener_protocol}"
+  port = var.lb_listener_port
+  protocol = var.lb_listener_protocol
 
   default_action {
     type = "forward"
@@ -80,12 +80,12 @@ module "vpc" {
 
   name = "${var.prefix}-SS-vpc"
 
-  cidr = "${var.vpc_cidr}"
+  cidr = var.vpc_cidr
 
-  azs = "${var.azs}"
+  azs = var.azs
 
-  private_subnets = "${var.private_subnets}"
-  public_subnets = "${var.public_subnets}"
+  private_subnets = var.private_subnets
+  public_subnets = var.public_subnets
 
   assign_generated_ipv6_cidr_block = true
 
@@ -112,14 +112,14 @@ module "vpc" {
 resource "aws_instance" "screen-scrape-ec2" {
   count = 3
 
-  ami = "${var.ami}"
+  ami = var.ami
   // C24519-screen-scraper-hsbc-nginx-ec2 AMI
-  instance_type = "${var.ec2_instance_type}"
+  instance_type = var.ec2_instance_type
   subnet_id = module.vpc.private_subnets[count.index]
   availability_zone = var.azs[count.index]
 
   security_groups = [
-    "${aws_security_group.tcp-port80.id}"]
+    aws_security_group.tcp-port80.id]
 
   tags = {
     Name = "${var.prefix}-SS-hsbc-${var.azs[count.index]}"
