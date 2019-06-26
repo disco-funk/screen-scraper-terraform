@@ -43,3 +43,13 @@ output "instance_tags" {
 output "instance_ids" {
   value = aws_instance.screen-scrape-ec2.*.id
 }
+
+
+# Outputs for terratest
+output "region" {
+  value = "${var.region}"
+}
+
+output "expected_vpc_cidr" {
+  value = "${var.vpc_cidr}"
+}

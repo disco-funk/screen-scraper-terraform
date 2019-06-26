@@ -12,14 +12,15 @@ var terraformOptions = &terraform.Options{
 	TerraformDir: "../screen-scraper-terraform",
 
 	Vars: map[string]interface{}{
-		"prefix": "C24519-test",
+		"prefix": "C24519-mancs",
 	},
 }
+
 
 func Test(t *testing.T) {
 	t.Parallel()
 
-	terraform.WorkspaceSelectOrNew(t, terraformOptions, "terratest")
+	terraform.WorkspaceSelectOrNew(t, terraformOptions, "terratest-mancs")
 	defer terraform.WorkspaceSelectOrNew(t, terraformOptions, "default")
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -30,17 +31,20 @@ func Test(t *testing.T) {
 }
 
 func checkOutput(t *testing.T) {
-	expectedVprCidrBlock := "10.32.0.0/16"
-	vprCidrBlock := terraform.Output(t, terraformOptions, "vpc_cidr_block")
-	assert.Equal(t, expectedVprCidrBlock, vprCidrBlock)
+	expectedVpcCidrBlock := terraform.Output(t, terraformOptions, "expected_vpc_cidr")
+	acutalVprCidrBlock := terraform.Output(t, terraformOptions, "vpc_cidr_block")
+
+	assert.Equal(t, expectedVpcCidrBlock, acutalVprCidrBlock)
 }
 
 func checkInstances(t *testing.T) {
+	region := terraform.Output(t, terraformOptions, "region")
 	instanceTags := terraform.OutputList(t, terraformOptions, "instance_tags")
 	instanceIds := terraform.OutputList(t, terraformOptions, "instance_ids")
+
 	for index, instanceTag := range instanceTags {
 		actualInstanceIds := aws.GetEc2InstanceIdsByFilters(t,
-			"eu-west-2",
+			region,
 			map[string][]string{"tag:Name": {instanceTag},
 				"instance-state-name": {"running"}})
 		assert.Equal(t, instanceIds[index], actualInstanceIds[0])

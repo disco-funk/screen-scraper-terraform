@@ -1,11 +1,6 @@
-variable "prefix" {
-  description = "Prefix for all resources."
-  type = "string"
-  default = "C24519"
-}
-
 provider "aws" {
-  region = "eu-west-2"
+  //region = "eu-west-2"
+  region = "${var.region}"
   profile = "default"
 }
 
@@ -29,10 +24,10 @@ resource "aws_security_group" "tcp-port80" {
   vpc_id = module.vpc.vpc_id
 
   ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port = "${var.ingress_from_port}"
+    to_port = "${var.ingress_to_port}"
+    protocol = "${var.ingress_protocol}"
+    cidr_blocks = "${var.ingress_cidr_blocks}"
   }
 
   tags = {
@@ -40,19 +35,10 @@ resource "aws_security_group" "tcp-port80" {
   }
 }
 
-variable "azs" {
-  description = "Run the EC2 Instances in these Availability Zones"
-  type = "list"
-  default = [
-    "eu-west-2a",
-    "eu-west-2b",
-    "eu-west-2c"]
-}
-
 resource "aws_lb" "nlb" {
   name = "${var.prefix}-SS-nlb"
   internal = false
-  load_balancer_type = "network"
+  load_balancer_type = "${var.lb_type}"
   subnets = module.vpc.public_subnets
 
   tags = {
@@ -62,8 +48,8 @@ resource "aws_lb" "nlb" {
 
 resource "aws_lb_listener" "lb_subnet_tcp" {
   load_balancer_arn = aws_lb.nlb.arn
-  port = "80"
-  protocol = "TCP"
+  port = "${var.lb_listener_port}"
+  protocol = "${var.lb_listener_protocol}"
 
   default_action {
     type = "forward"
@@ -94,23 +80,12 @@ module "vpc" {
 
   name = "${var.prefix}-SS-vpc"
 
-  cidr = "10.32.0.0/16"
+  cidr = "${var.vpc_cidr}"
 
-  azs = [
-    "eu-west-2a",
-    "eu-west-2b",
-    "eu-west-2c"]
-  private_subnets = [
-    "10.32.24.0/22",
-    "10.32.28.0/22",
-    "10.32.32.0/22",
-    "10.32.0.0/22",
-    "10.32.4.0/22",
-    "10.32.8.0/22"]
-  public_subnets = [
-    "10.32.12.0/22",
-    "10.32.16.0/22",
-    "10.32.20.0/22"]
+  azs = "${var.azs}"
+
+  private_subnets = "${var.private_subnets}"
+  public_subnets = "${var.public_subnets}"
 
   assign_generated_ipv6_cidr_block = true
 
@@ -137,9 +112,9 @@ module "vpc" {
 resource "aws_instance" "screen-scrape-ec2" {
   count = 3
 
-  ami = "ami-0395e39e84620dd79"
+  ami = "${var.ami}"
   // C24519-screen-scraper-hsbc-nginx-ec2 AMI
-  instance_type = "t2.micro"
+  instance_type = "${var.ec2_instance_type}"
   subnet_id = module.vpc.private_subnets[count.index]
   availability_zone = var.azs[count.index]
 
