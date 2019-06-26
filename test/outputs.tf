@@ -8,3 +8,8 @@ output "instance_tag" {
 output "instance_id" {
   value = aws_instance.direct-channel-mock.id
 }
+
+# Outputs for terratest
+output "region" {
+  value = var.region
+}
