@@ -49,9 +49,10 @@ func configureTestOptions() *terraform.Options {
 }
 
 func checkOutput(t *testing.T, terraformOptions *terraform.Options) {
-	expectedVprCidrBlock := "10.32.0.0/16"
-	vprCidrBlock := terraform.Output(t, terraformOptions, "vpc_cidr_block")
-	assert.Equal(t, expectedVprCidrBlock, vprCidrBlock)
+	expectedVpcCidrBlock := terraform.Output(t, terraformOptions, "expected_vpc_cidr")
+	acutalVprCidrBlock := terraform.Output(t, terraformOptions, "vpc_cidr_block")
+
+	assert.Equal(t, expectedVpcCidrBlock, acutalVprCidrBlock)
 }
 
 func checkInstances(t *testing.T, terraformOptions *terraform.Options) {
