@@ -12,7 +12,7 @@ var terraformOptions = &terraform.Options{
 	TerraformDir: "../screen-scraper-terraform",
 
 	Vars: map[string]interface{}{
-		"prefix": "C24519-mancs",
+		"prefix": "C24519-test",
 	},
 }
 
@@ -20,7 +20,7 @@ var terraformOptions = &terraform.Options{
 func Test(t *testing.T) {
 	t.Parallel()
 
-	terraform.WorkspaceSelectOrNew(t, terraformOptions, "terratest-mancs")
+	terraform.WorkspaceSelectOrNew(t, terraformOptions, "terratest")
 	defer terraform.WorkspaceSelectOrNew(t, terraformOptions, "default")
 
 	defer terraform.Destroy(t, terraformOptions)
