@@ -50,29 +50,33 @@ func configureTestOptions() *terraform.Options {
 
 func checkOutput(t *testing.T, terraformOptions *terraform.Options) {
 	expectedVpcCidrBlock := terraform.Output(t, terraformOptions, "expected_vpc_cidr")
-	acutalVprCidrBlock := terraform.Output(t, terraformOptions, "vpc_cidr_block")
+	actualVprCidrBlock := terraform.Output(t, terraformOptions, "vpc_cidr_block")
 
-	assert.Equal(t, expectedVpcCidrBlock, acutalVprCidrBlock)
+	assert.Equal(t, expectedVpcCidrBlock, actualVprCidrBlock)
 }
 
 func checkInstances(t *testing.T, terraformOptions *terraform.Options) {
+	region := terraform.Output(t, terraformOptions, "region")
 	instanceTags := terraform.OutputList(t, terraformOptions, "instance_tags")
 	instanceIds := terraform.OutputList(t, terraformOptions, "instance_ids")
 	for index, instanceTag := range instanceTags {
 		actualInstanceIds := aws.GetEc2InstanceIdsByFilters(t,
-			"eu-west-2",
+			region,
 			map[string][]string{"tag:Name": {instanceTag},
 				"instance-state-name": {"running"}})
+
 		assert.Equal(t, instanceIds[index], actualInstanceIds[0])
 	}
 }
 
 func checkMockInstance(t *testing.T, terraformTestOptions *terraform.Options) {
+	region := terraform.Output(t, terraformTestOptions, "region")
 	instanceTag := terraform.Output(t, terraformTestOptions, "instance_tag")
 	instanceId := terraform.Output(t, terraformTestOptions, "instance_id")
 	actualInstanceIds := aws.GetEc2InstanceIdsByFilters(t,
-		"eu-west-2",
+		region,
 		map[string][]string{"tag:Name": {instanceTag},
 			"instance-state-name": {"running"}})
+
 	assert.Equal(t, instanceId, actualInstanceIds[0])
 }
