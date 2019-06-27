@@ -68,7 +68,7 @@ resource "aws_lb_target_group" "target-group" {
 }
 
 resource "aws_lb_target_group_attachment" "target-group-attachment" {
-  count = 3
+  count = length(var.azs)
 
   target_group_arn = aws_lb_target_group.target-group.arn
   target_id = aws_instance.screen-scrape-ec2[count.index].id
@@ -110,7 +110,7 @@ module "vpc" {
 }
 
 resource "aws_instance" "screen-scrape-ec2" {
-  count = 3
+  count = length(var.azs)
 
   ami = var.ami
   // C24519-screen-scraper-hsbc-nginx-ec2 AMI
