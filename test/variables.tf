@@ -7,3 +7,9 @@ variable "prefix" {
   type = "string"
   default = "C24519-test"
 }
+
+variable "key_name" {
+  description = "The name of a secure public key."
+  type = string
+  default = "C24519-test"
+}

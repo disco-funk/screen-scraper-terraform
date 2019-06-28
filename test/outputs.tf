@@ -13,3 +13,11 @@ output "instance_id" {
 output "region" {
   value = var.region
 }
+
+output "instance_public_ip" {
+  value = aws_instance.direct-channel-mock.public_ip
+}
+
+//output "eip" {
+//  value = aws_eip.direct-channel-eip.public_ip
+//}
