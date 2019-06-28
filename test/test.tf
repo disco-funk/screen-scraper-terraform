@@ -51,13 +51,24 @@ resource "null_resource" "direct-channel-nr" {
   }
 
   provisioner "file" {
+    source      = "apt"
+    destination = "apt"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x apt",
+      "sudo ./apt install -y default-jre"
+    ]
+  }
+
+  provisioner "file" {
     source      = "wiremock-standalone-2.23.2.jar"
     destination = "wiremock-standalone-2.23.2.jar"
   }
 
   provisioner "remote-exec" {
     inline = [
-      "sudo apt install -y default-jre",
       "nohup java -jar wiremock-standalone-2.23.2.jar &",
       "sleep 1"
     ]
